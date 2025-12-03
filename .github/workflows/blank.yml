@@ -1,0 +1,39 @@
+name: Parse Graphics
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Кожні 6 годин (мінімум 5 хв не працює насправді)
+  workflow_dispatch:  # Кнопка для ручного запуску
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+      
+      - name: Run parser
+        run: |
+          cd Parser
+          dotnet restore
+          dotnet run
+      
+      - name: Commit and push graphics
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add graphics/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 Update graphics $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)
