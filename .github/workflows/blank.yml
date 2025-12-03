@@ -2,7 +2,7 @@ name: Parse Graphics
 
 on:
   schedule:
-    - cron: '0 */2 * * *'  # Кожні 2 годин 
+    - cron: '0 * * * *' # <-- Запуск о 00 хвилин кожної години
   workflow_dispatch:  # Кнопка для ручного запуску
 
 jobs:
