@@ -27,7 +27,7 @@ jobs:
       
       - name: Run parser
         run: |
-          cd Parser
+          cd Parser/Parser
           dotnet restore
           dotnet run
       
