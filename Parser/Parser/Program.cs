@@ -57,9 +57,29 @@ class Program
 
             // Час оновлення
             var updateFile = Path.Combine(graphicsDir, "last_update.txt");
-            await File.WriteAllTextAsync(updateFile, DateTime.UtcNow.ToString("dd.MM.yyyy HH:mm UTC"));
 
-            Console.WriteLine($"\n✓ Готово! Збережено {imageUrls.Count} графіків");
+
+            TimeZoneInfo kyivZone;
+            try
+            {
+                kyivZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Kyiv");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                kyivZone = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Помилка при визначенні часового поясу: {ex.Message}. Використовується UTC.");
+                await File.WriteAllTextAsync(updateFile, DateTime.UtcNow.ToString("dd.MM.yyyy HH:mm UTC"));
+                return;
+            }
+
+            var kyivTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, kyivZone);
+
+            await File.WriteAllTextAsync(updateFile, kyivTime.ToString("dd.MM.yyyy HH:mm 'EET'"));
+
+            Console.WriteLine($"\n✓ Готово! Збережено {imageUrls.Count} графіків. Час: {kyivTime:dd.MM.yyyy HH:mm EET}");
         }
         catch (Exception ex)
         {
