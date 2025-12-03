@@ -2,7 +2,7 @@ name: Parse Graphics
 
 on:
   schedule:
-    - cron: '0 */2 * * *'  # Кожні 6 годин (мінімум 5 хв не працює насправді)
+    - cron: '0 */2 * * *'  # Кожні 2 годин 
   workflow_dispatch:  # Кнопка для ручного запуску
 
 jobs:
@@ -31,9 +31,9 @@ jobs:
           dotnet restore
           dotnet run
       
-      - name: Commit and push graphics
+      - name: Commit and push
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          git add graphics/
+          git add Parser/graphics/
           git diff --quiet && git diff --staged --quiet || (git commit -m "🔄 Update graphics $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)
